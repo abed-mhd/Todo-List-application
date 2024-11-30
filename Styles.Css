@@ -1,0 +1,108 @@
+*,*::before,*::after{
+    box-sizing: border-box;
+}
+body{
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: space-around;
+    background-color:steelblue;
+    color: aliceblue;
+}
+.my-list{
+    margin-top:10vh;
+    background-color:rgba(0,0,0,0.5);
+    padding: 1.2rem;
+    height: max-content;
+}
+.my-list .title{
+    padding: 1.2rem;
+    font-size: 25px;
+}
+.my-list ul{
+    padding-left: 1.4rem;
+    list-style: circle;
+}
+.my-list .list{
+    padding: 0.5rem 0.1rem;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out;
+}
+.my-list .list.selected{
+    font-weight: 900;
+}
+.my-list .list:hover{
+    opacity: 0.7;
+}
+
+.new-list-form,.new-task-form{
+    display: flex;
+    align-items: center;
+}
+.new-list-input,.new-task-input{
+    order: 2;
+    background: transparent;
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    border-bottom: 1px solid white;
+}
+.new-list-button,.new-task-button{
+    color: white;
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    font-size: 20px;
+    transition: all 150ms ease-in-out;
+}
+.new-list-button:hover{
+    opacity: 0.7;
+}
+
+.list-tasks{
+    display: none;
+    margin-top: 10vh;
+    background-color: rgba(0,0,0,0.5);
+    font-size: 20px;
+    padding: 1.2rem;
+    width: 400px;
+
+}
+.list-tasks  .list-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.tasks{
+    padding: 0.5rem;
+    border-top: 1px solid white;
+}
+.task{
+    padding:1rem 0;
+    cursor: pointer;
+    transition: all 200ms ease-in-out;
+}
+.task input,.task label{
+    cursor: pointer;
+}
+.task:hover{
+    background-color: steelblue;
+}
+.clear-tasks,.delete-list{
+    padding: 1rem;
+    margin: 1.2rem;
+    color: white;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid white;
+    transition: all 200ms ease-in-out;
+}
+.clear-tasks:hover,.delete-list:hover{
+    background-color: steelblue;
+    border-color: steelblue;
+}
