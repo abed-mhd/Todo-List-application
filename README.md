@@ -52,3 +52,43 @@ To analyze your JavaScript code using ESLint, run the following command:
 
     ```bash
     npx eslint script.js
+    
+## What to Expect
+When you run ESLint on your JavaScript code, you will see feedback about the code quality based on the rules set in eslint.config.mjs. Here are some examples of what you might see:
+- Example 1: Undefined Variable (Error)
+if you added this function:
+function test() {
+  console.log(a);
+}
+Output:
+
+   ```bash
+   error  'a' is not defined  no-undef
+   ```
+In this case, ESLint will show an error because the variable a is used but not defined.
+
+- Example 2: Single Quotes (Warning)
+const message = 'Hello, world!';
+
+Output:
+
+   ```bash
+   1:14  warn  Prefer double quotes  quotes
+   ```
+ESLint will issue a warning because single quotes are used instead of double quotes, based on the quotes rule.
+
+Example 3: Unused Variable (Warning)
+const unusedVar = 5;
+Output:
+   ```bash
+   1:14  warn  'unusedVar' is assigned a value but never used  no-unused-vars
+   ```
+ESLint will show a warning because the variable unusedVar is declared but not used in the code.
+
+Example 4: Missing Semicolon (Error)
+const a = 10
+Output:
+   ```bash
+   1:18  error  Missing semicolon  semi
+   ```
+ESLint will show an error because the statement is missing a semicolon at the end.
