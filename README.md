@@ -39,8 +39,8 @@ export default [
 ## Explanation of eslint.config.mjs
 In the configuration file:
 
-globals.browser: Specifies that the global variables for browsers are available (e.g., window, document, etc.).
-rules:
+- globals.browser: Specifies that the global variables for browsers are available (e.g., window, document, etc.).
+- rules:
 "no-undef": "error": Flags undefined variables as errors.
 "quotes": ["warn", "double"]: Issues a warning if single quotes are used instead of double quotes.
 "no-unused-vars": "warn": Warns about variables that are declared but not used in the code.
