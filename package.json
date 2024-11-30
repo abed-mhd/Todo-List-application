@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "script.js",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start": "owc-dev-server"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +15,8 @@
     "eslint": "^9.16.0",
     "globals": "^15.12.0",
     "husky": "^9.1.7"
+  },
+  "dependencies": {
+    "loglevel": "^1.9.2"
   }
 }

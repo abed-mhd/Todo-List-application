@@ -10,6 +10,9 @@ const TaskInput = document.querySelector('[data-new-task-input]');
 const ClearTasksButton = document.querySelector('[data-clear-tasks-button]');
 const ClearListButton = document.querySelector('[data-delete-list-button]');
 
+// Setting up the logger level
+log.setLevel('info'); 
+
 ClearListButton.addEventListener('click', () => {
     DeleteSelectedList();
 });
@@ -26,10 +29,14 @@ let selected_id = localStorage.getItem(LOCAL_STORAGE_SELECTED_ID_KEY);
 ListForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const ListName = ListInput.value;
-    if (ListName === null || ListName === '') return;
+    if (ListName === null || ListName === '') {
+        log.warn('Attempted to create a list with an empty name');
+        return;
+    }
     const List = CreateList(ListName);
     lists.push(List);
     ListInput.value = null;
+    log.info(`New list created: ${ListName}`);
     render();
     Save();
 });
@@ -37,11 +44,15 @@ ListForm.addEventListener('submit', (e) => {
 TaskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const TaskName = TaskInput.value;
-    if (TaskName === null || TaskName === '') return;
+    if (TaskName === null || TaskName === '') {
+        log.warn('Attempted to create a task with an empty name');
+        return;
+    }
     const Task = CreateTask(TaskName);
     TaskInput.value = null;
     const selectedlist = lists.find((list) => list.id === selected_id);
     selectedlist.tasks.push(Task);
+    log.info(`New task created: ${TaskName} for list ${selectedlist.name}`);
     render();
     Save();
 });
@@ -113,14 +124,19 @@ function CreateTask(name) {
 }
 
 function Save() {
-    localStorage.setItem(LOCAL_STORAGE_LISTS_KEY, JSON.stringify(lists));
-    localStorage.setItem(LOCAL_STORAGE_SELECTED_ID_KEY, selected_id);
+    try {
+        localStorage.setItem(LOCAL_STORAGE_LISTS_KEY, JSON.stringify(lists));
+        localStorage.setItem(LOCAL_STORAGE_SELECTED_ID_KEY, selected_id);
+    } catch (error) {
+        log.error(`Failed to save tasks: ${error.message}`);  // Error log if saving fails
+    }
 }
 
 function DeleteSelectedList() {
     lists = lists.filter((list) => list.id !== selected_id);
     selected_id = null;
     ListTasksContainer.style.display = 'none';
+    log.info('Selected list deleted');
     render();
     Save();
 }
@@ -142,11 +158,16 @@ function ClearCheckedTasks() {
         if (checkbox.checked) {
             lists.forEach((list) => {
                 if (list.id === selected_id) {
+                    const taskToDelete = list.tasks.find((task) => task.id === checkbox.id);
+                    if (taskToDelete) {
+                        log.trace(`Task deleted: ${taskToDelete.name}, List ID: ${list.id}`);  // Critical log for task deletion
+                    }
                     list.tasks = list.tasks.filter((task) => task.id !== checkbox.id);
                 }
             });
         }
     });
+    log.info('Checked tasks cleared');
     render();
     Save();
 }
