@@ -1,100 +1,64 @@
-# Automate Static Code Analysis with ESLint and Husky Pre-commit Hooks
-This project automates the execution of ESLint (static code analysis) before every commit using Husky pre-commit hooks. This ensures that your code is always linted and adheres to quality standards before committing to the repository.
+# Logging Implementation in Task Management App
+This README explains how I implemented logging at different levels using the loglevel library in the Task Management App. The application uses logging to track key actions, issues, and events throughout the app. I’ve used different log levels to capture info, warn, error, and critical logs.
 
-## Prerequisites
-- Node.js (version 16 or higher)
-- npm (comes bundled with Node.js)
-## Installation and Setup
-1. Initialize Your Node.js Project
-If you haven't already, initialize a new Node.js project by running:
+## Log Levels Used
+1. Log Level: info
+Purpose: General informational messages that provide insights into the application's flow. These messages do not indicate any errors or warnings.
 
-  ```bash
-  npm init -y
-  ```
-2. Install ESLint and Husky
-Install ESLint and Husky as development dependencies:
+Example in Code: Informing about the creation of a new task.
 
-  ```bash
-  npm install eslint --save-dev
-  npm install husky --save-dev
-  ```
-3. Set Up ESLint
-Initialize ESLint and create a configuration file:
+log.info(`New task created: ${TaskName} for list ${selectedlist.name}`);
 
-  ```bash
-  npx eslint --init
-  ```
-Follow the prompts to set up ESLint. You can choose to use a popular configuration like Airbnb or create your own.
+Context: This log occurs when a new task is successfully created. It’s meant to track normal, expected app behavior.
 
-4. Add lint Script to package.json
-Ensure that your package.json includes a lint script under the scripts section:
+2. Log Level: warn
+Purpose: Used when something unexpected happens, but it doesn’t necessarily disrupt the application’s functioning. This level is typically for less severe issues that may need attention.
 
-{
-  "scripts": {
-    "lint": "eslint ."
-  }
-}
+Example in Code: Logging when a user tries to create a list or task with an empty name.
 
-5. Set Up Husky
-Initialize Husky and add a pre-commit hook that runs ESLint before committing:
+log.warn('Attempted to create a task with an empty name');
 
-  ```bash
-  npx husky install
-  npx husky add .husky/_/pre-commit "npm run lint"
-  ```
-This will create a .husky/pre-commit file that runs the ESLint linting command before each commit.
+Context: This log is useful to inform developers when a user tries to perform an action with invalid input, such as an empty task name.
 
-**Make sure the .husky/pre-commit file is executable:**
-  ```bash
-  chmod +x .husky/_/pre-commit
-  ```
-6. (Optional) Customize ESLint Rules
-You can customize your ESLint configuration by editing .eslintrc.json or another configuration file ESLint generated during the setup process. You can define your own rules or use recommended settings.
+3. Log Level: error
+Purpose: Captures error messages indicating a failure in the application. These logs typically signal that something went wrong, and the application may not function as expected.
 
-For example, to enforce double quotes and warn about unused variables, your ESLint config can look like:
+Example in Code: Logging an error when the application fails to save data to localStorage.
 
-json
-Copy code
-{
-  "rules": {
-    "quotes": ["warn", "double"],
-    "no-unused-vars": "warn"
-  }
-}
+log.error(`Failed to save tasks: ${error.message}`);
 
-7. Example of the .husky/pre-commit File
-After setting up the pre-commit hook, the .husky/pre-commit file should look like this:
+Context: This log is useful for tracking problems with data persistence or unexpected failures during application execution.
 
-  ```bash
-  #!/bin/sh
-  # .husky/pre-commit
+4. Log Level: critical
+Purpose: Represents the most severe level of logging. Critical logs are for situations where something significant has gone wrong (such as a major failure or data loss).
 
-  echo "Pre-commit hook triggered!" # This will print when the hook runs
+Example in Code: Logging when a task is deleted, especially if this action is irreversible.
 
-  # Run linting or other checks
-  npm run lint
-  ```
-This file will print "Pre-commit hook triggered!" when the hook is triggered and will run npm run lint to execute ESLint.
+log.critical(`Task deleted: ${taskToDelete.name}, List ID: ${list.id}`);
 
-## Running ESLint with Husky
-Once everything is set up, Husky will automatically run ESLint each time you commit, ensuring your code is linted before committing it to the repository.
+Context: This log helps track major changes like task deletion and can be used for debugging if something goes wrong during these sensitive operations.
 
-1. Make a Commit
-Try to commit some changes, and the pre-commit hook will automatically run ESLint before proceeding:
+## Code Implementation
+To implement logging, I used the loglevel library. This library was included in the index.html file with the following <script> tag:
 
-  ```bash
-  git add .
-  git commit -m "Your commit message"
-  ```
-2. ESLint Output
-If there are any linting issues (unused variables, wrong quotes ...), ESLint will output them in the terminal. You will be prompted to fix the issues before you can commit the changes.
+<script src="https://cdn.jsdelivr.net/npm/loglevel@1.8.1/dist/loglevel.min.js" defer></script>
 
-3. What to Expect
-No linting issues: If your code is lint-free, the commit will proceed as usual.
-Linting issues: If ESLint finds any issues, they will be displayed in the terminal, and the commit will be blocked until the issues are fixed.
+This script imports the loglevel library, which provides various methods to set the log level and log messages at different levels (e.g., log.info(), log.warn(), log.error(), and log.critical()).
 
-Example of what you might see in the terminal if there are linting errors:
-Pre-commit hook triggered!
-✖ 1 problem (1 error, 0 warnings)
-  1:1  error  Unexpected console statement  no-console
-✖ ESLint found some problems. Please fix them and try committing again.
+### Log Level Setup
+I set the log level in the JavaScript file script.js using the following code:
+
+log.setLevel('info');  // You can change this level to 'debug', 'warn', 'error', or 'silent' depending on your needs.
+### Example Code Snippets
+Info Log for Task Creation: Tracks when a new task is created.
+
+log.info(`New task created: ${TaskName} for list ${selectedlist.name}`);
+Warning Log for Invalid Task Input: Warns if the user attempts to create a task with an empty name.
+
+log.warn('Attempted to create a task with an empty name');
+Error Log for Failure in Saving to LocalStorage: Captures errors when saving tasks to localStorage fails.
+
+log.error(`Failed to save tasks: ${error.message}`);
+Critical Log for Task Deletion: Logs when a task is deleted from the list.
+
+log.critical(`Task deleted: ${taskToDelete.name}, List ID: ${list.id}`);
