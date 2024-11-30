@@ -10,8 +10,10 @@ const TaskInput = document.querySelector('[data-new-task-input]');
 const ClearTasksButton = document.querySelector('[data-clear-tasks-button]');
 const ClearListButton = document.querySelector('[data-delete-list-button]');
 
+import { filterTasksByCompletion, countTasks } from './utils.js';
+
 // Setting up the logger level
-log.setLevel('info'); 
+log.setLevel('info');
 
 ClearListButton.addEventListener('click', () => {
     DeleteSelectedList();
@@ -86,7 +88,8 @@ function render() {
             ClearElement(TasksContainer);
             list_element.classList.add('selected');
             ListTasksContainer.style.display = 'block';
-            list.tasks.forEach((task) => {
+            const filteredTasks = filterTasksByCompletion(list.tasks, false);
+            filteredTasks.forEach((task) => {
                 const Task = document.createElement('div');
                 Task.classList.add('task');
                 const checkbox = document.createElement('input');
@@ -101,8 +104,7 @@ function render() {
                 TasksContainer.append(Task);
             });
             HeaderTitle.innerText = list.name;
-            const CompletedTasksCount = CompletedTasks();
-            HeaderTasksRemaining.innerText = `${list.tasks.length - CompletedTasksCount} Tasks Remaining`;
+            HeaderTasksRemaining.innerText = `${countTasks(list.tasks, false)} Tasks Remaining`;
         }
         list_element.innerText = list.name;
         ListsContainer.append(list_element);
@@ -128,7 +130,7 @@ function Save() {
         localStorage.setItem(LOCAL_STORAGE_LISTS_KEY, JSON.stringify(lists));
         localStorage.setItem(LOCAL_STORAGE_SELECTED_ID_KEY, selected_id);
     } catch (error) {
-        log.error(`Failed to save tasks: ${error.message}`);  // Error log if saving fails
+        log.error(`Failed to save tasks: ${error.message}`);
     }
 }
 
@@ -141,16 +143,6 @@ function DeleteSelectedList() {
     Save();
 }
 
-function CompletedTasks() {
-    let count = 0;
-    const CheckBoxex = document.querySelectorAll('.checkboxex');
-    if (CheckBoxex.length === 0) return count;
-    CheckBoxex.forEach((checkbox) => {
-        if (checkbox.checked) count++;
-    });
-    return count;
-}
-
 function ClearCheckedTasks() {
     const CheckBoxex = document.querySelectorAll('.checkboxex');
     if (CheckBoxex.length === 0) return;
@@ -159,9 +151,6 @@ function ClearCheckedTasks() {
             lists.forEach((list) => {
                 if (list.id === selected_id) {
                     const taskToDelete = list.tasks.find((task) => task.id === checkbox.id);
-                    if (taskToDelete) {
-                        log.trace(`Task deleted: ${taskToDelete.name}, List ID: ${list.id}`);  // Critical log for task deletion
-                    }
                     list.tasks = list.tasks.filter((task) => task.id !== checkbox.id);
                 }
             });
