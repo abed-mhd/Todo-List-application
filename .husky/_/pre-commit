@@ -1,0 +1,3 @@
+# Example pre-commit command
+echo "Pre-commit hook triggered!" # This will print when the hook runs
+npm run lint
