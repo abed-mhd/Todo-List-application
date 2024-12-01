@@ -1,19 +1,21 @@
+import { filterTasksByCompletion, countTasks, generateRandomID } from './utils.js';
+
+log.setLevel("info"); // I chose 'info', but i could have set it to 'warn', 'debug', 'error'
+//log.setLevel("error"); 
+//log.setLevel("warn"); 
+//log.setLevel("debug"); // Looks the same as 'info' to me.
+
 const ListsContainer = document.querySelector('[data-lists-container]');
 const ListForm = document.querySelector('[data-new-list-form]');
 const ListInput = document.querySelector('[data-new-list-input]');
 const ListTasksContainer = document.getElementById('list-tasks');
 const HeaderTitle = document.querySelector('[data-header-title]');
 const HeaderTasksRemaining = document.querySelector('[data-header-tasks-remaining]');
-const TasksContainer = document.querySelector('[data-tasks-container]');
+const TasksContainer = document.querySelector('[data-tasks-container]')
 const TaskForm = document.querySelector('[data-new-task-form]');
 const TaskInput = document.querySelector('[data-new-task-input]');
 const ClearTasksButton = document.querySelector('[data-clear-tasks-button]');
 const ClearListButton = document.querySelector('[data-delete-list-button]');
-
-import { filterTasksByCompletion, countTasks } from './utils.js';
-
-// Setting up the logger level
-log.setLevel('info');
 
 ClearListButton.addEventListener('click', () => {
     DeleteSelectedList();
@@ -28,10 +30,10 @@ const LOCAL_STORAGE_SELECTED_ID_KEY = 'list.id';
 let lists = JSON.parse(localStorage.getItem(LOCAL_STORAGE_LISTS_KEY)) || [];
 let selected_id = localStorage.getItem(LOCAL_STORAGE_SELECTED_ID_KEY);
 
-ListForm.addEventListener('submit', (e) => {
+ListForm.addEventListener('submit', e => {
     e.preventDefault();
     const ListName = ListInput.value;
-    if (ListName === null || ListName === '') {
+    if (!ListName) {
         log.warn('Attempted to create a list with an empty name');
         return;
     }
@@ -43,23 +45,23 @@ ListForm.addEventListener('submit', (e) => {
     Save();
 });
 
-TaskForm.addEventListener('submit', (e) => {
+TaskForm.addEventListener('submit', e => {
     e.preventDefault();
     const TaskName = TaskInput.value;
-    if (TaskName === null || TaskName === '') {
+    if (!TaskName) {
         log.warn('Attempted to create a task with an empty name');
         return;
     }
     const Task = CreateTask(TaskName);
     TaskInput.value = null;
-    const selectedlist = lists.find((list) => list.id === selected_id);
-    selectedlist.tasks.push(Task);
-    log.info(`New task created: ${TaskName} for list ${selectedlist.name}`);
+    const selectedList = lists.find(list => list.id === selected_id);
+    selectedList.tasks.push(Task);
+    log.info(`New task created: ${TaskName} for list ${selectedList.name}`);
     render();
     Save();
 });
 
-ListsContainer.addEventListener('click', (e) => {
+ListsContainer.addEventListener('click', e => {
     if (e.target.tagName.toLowerCase() === 'li') {
         selected_id = e.target.dataset.id;
         render();
@@ -67,11 +69,12 @@ ListsContainer.addEventListener('click', (e) => {
     }
 });
 
-TasksContainer.addEventListener('click', (e) => {
-    if (e.target.tagName.toLowerCase() === 'input' && e.target.type === 'checkbox') {
-        const selectedlist = lists.find((list) => list.id === selected_id);
-        const selectedtask = selectedlist.tasks.find((task) => task.id === e.target.id);
-        selectedtask.completed = !selectedtask.completed;
+TasksContainer.addEventListener('click', e => {
+    if (e.target.tagName.toLowerCase() === 'div') {
+        const selectedList = lists.find(list => list.id === selected_id);
+        const selectedTask = selectedList.tasks.find(task => task.id ===
+            e.target.querySelector('input').id);
+        selectedTask.completed = !selectedTask.completed;
         render();
         Save();
     }
@@ -80,34 +83,38 @@ TasksContainer.addEventListener('click', (e) => {
 function render() {
     ClearElement(ListsContainer);
     if (lists.length === 0) return;
-    lists.forEach((list) => {
-        const list_element = document.createElement('li');
-        list_element.classList.add('list');
-        list_element.dataset.id = list.id;
-        if (list_element.dataset.id === selected_id) {
+
+    lists.forEach(list => {
+        const listElement = document.createElement('li');
+        listElement.classList.add('list');
+        listElement.dataset.id = list.id;
+        if (listElement.dataset.id === selected_id) {
             ClearElement(TasksContainer);
-            list_element.classList.add('selected');
+            listElement.classList.add('selected');
             ListTasksContainer.style.display = 'block';
-            const filteredTasks = filterTasksByCompletion(list.tasks, false);
-            filteredTasks.forEach((task) => {
+
+            const completedTasks = filterTasksByCompletion(list.tasks, true);
+
+            list.tasks.forEach(task => {
                 const Task = document.createElement('div');
                 Task.classList.add('task');
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.id = task.id.toString();
+                checkbox.id = task.id;
                 checkbox.checked = task.completed;
                 checkbox.classList.add('checkboxex');
                 const Label = document.createElement('label');
-                Label.htmlFor = task.id.toString();
+                Label.htmlFor = task.id;
                 Label.innerText = task.name;
                 Task.append(checkbox, Label);
                 TasksContainer.append(Task);
             });
+
             HeaderTitle.innerText = list.name;
-            HeaderTasksRemaining.innerText = `${countTasks(list.tasks, false)} Tasks Remaining`;
+            HeaderTasksRemaining.innerText = `${list.tasks.length - completedTasks.length} Tasks Remaining`;
         }
-        list_element.innerText = list.name;
-        ListsContainer.append(list_element);
+        listElement.innerText = list.name;
+        ListsContainer.append(listElement);
     });
 }
 
@@ -118,11 +125,11 @@ function ClearElement(element) {
 }
 
 function CreateList(name) {
-    return { id: Date.now().toString(), name: name, tasks: [] };
+    return { id: generateRandomID(), name: name, tasks: [] };
 }
 
 function CreateTask(name) {
-    return { name: name, id: Date.now().toString(), completed: false };
+    return { name: name, id: generateRandomID(), completed: false };
 }
 
 function Save() {
@@ -135,28 +142,23 @@ function Save() {
 }
 
 function DeleteSelectedList() {
-    lists = lists.filter((list) => list.id !== selected_id);
+    lists = lists.filter(list => list.id !== selected_id);
     selected_id = null;
     ListTasksContainer.style.display = 'none';
-    log.info('Selected list deleted');
+    log.trace('Selected list deleted');
     render();
     Save();
 }
 
 function ClearCheckedTasks() {
-    const CheckBoxex = document.querySelectorAll('.checkboxex');
-    if (CheckBoxex.length === 0) return;
-    CheckBoxex.forEach((checkbox) => {
-        if (checkbox.checked) {
-            lists.forEach((list) => {
-                if (list.id === selected_id) {
-                    const taskToDelete = list.tasks.find((task) => task.id === checkbox.id);
-                    list.tasks = list.tasks.filter((task) => task.id !== checkbox.id);
-                }
-            });
-        }
-    });
-    log.info('Checked tasks cleared');
+    const selectedList = lists.find(list => list.id === selected_id);
+    if (!selectedList) return;
+
+    const initialTaskCount = selectedList.tasks.length;
+    selectedList.tasks = filterTasksByCompletion(selectedList.tasks, false);
+
+    const deletedTaskCount = initialTaskCount - selectedList.tasks.length;
+    log.info(`${deletedTaskCount} tasks cleared from list ${selectedList.name}`);
     render();
     Save();
 }
