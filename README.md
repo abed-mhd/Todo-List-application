@@ -1,37 +1,64 @@
-# Task Manager Application with Unit Testing
-The purpose is to showcase unit testing for critical functions and demonstrate their correctness.
+# Generating Documentation Using JSDoc
+This guide explains how to install JSDoc, resolve execution policy restrictions on Windows, and generate documentation for your JavaScript project.
 
-## Install dependencies:
-
+## Step 1: Install JSDoc
+Open a terminal or PowerShell window.
+Install JSDoc globally using the following command:
   ```bash
-  npm install
-  Run tests:
+  npm install -g jsdoc
   ```
+## Step 2: Resolve Execution Policy Restrictions on Windows
+If you encounter an error like:
+
+  ```vbnet
+  Impossible de charger le fichier ... car l’exécution de scripts est désactivée sur ce système.
+  ```
+This means PowerShell's execution policy is preventing script execution.
+
+1. Open PowerShell as an administrator.
+Check the current execution policy:
+  ```powershell
+  Get-ExecutionPolicy
+  ```
+2. Temporarily allow script execution by running:
+  ```powershell
+  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+  ```
+This change applies only to the current PowerShell session.
+
+## Step 3: Create the jsdoc.json Configuration File
+1. Navigate to your project directory:
   ```bash
-  npm test
+  cd path/to/your/project
   ```
-## Testing with Jest
-Unit testing is implemented for key utility functions in the utils.js file, such as:
 
-filterTasksByCompletion: Filters tasks based on their completion status.
-countTasks: Counts completed and incomplete tasks.
-generateRandomID: Generates unique random IDs for tasks or lists.
-Key File: script.test.js
-The script.test.js file contains unit tests for the above functions using Jest. Each function is tested for multiple cases to ensure correctness.
+2. Create a file named jsdoc.json with the following content:
+  ```json
+  {
+    "tags": {
+      "allowUnknownTags": true
+    },
+    "source": {
+      "include": ["script.js", "utils.js"],
+      "exclude": ["node_modules"],
+      "includePattern": ".+\\.js(doc|x)?$",
+      "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "opts": {
+      "destination": "./docs",
+      "recurse": true
+    }
+  }
+  ```
 
-Example Test Cases:
-filterTasksByCompletion:
+## Step 4: Generate Documentation
+Ensure your .js files (e.g., script.js and utils.js) are in the same directory as jsdoc.json.
+Run the following command to generate the documentation:
+  ```bash
+  jsdoc -c jsdoc.json
+  ```
+The documentation will be generated in the ./docs folder of your project.
 
-Returns only completed tasks when the isCompleted flag is true.
-Returns only incomplete tasks when the isCompleted flag is false.
-generateRandomID:
-
-Generates an ID of the default length.
-Generates an ID of a custom-specified length.
-Ensures all generated IDs are unique.
-
-## Expected Output
-You should see the following after running the tests:
-
-All tests passing if the functions are implemented correctly.
-Any failed test will display detailed output with the reason for failure.
+## Step 5: Open the Documentation
+Navigate to the ./docs folder in your project.
+Open the index.html file in any browser to view the generated documentation.
